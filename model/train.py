@@ -104,14 +104,14 @@ def train(
     train_set.dataset.transform = train_transform
     val_set.dataset.transform   = val_transform
 
-    # num_workers=4 for faster data loading with larger images
+    # num_workers=2 for stable data loading in Colab
     train_loader = DataLoader(
         train_set, batch_size=batch_size, shuffle=True,
-        num_workers=4, pin_memory=True, persistent_workers=True
+        num_workers=2, pin_memory=True, persistent_workers=True
     )
     val_loader = DataLoader(
         val_set, batch_size=batch_size, shuffle=False,
-        num_workers=4, pin_memory=True, persistent_workers=True
+        num_workers=2, pin_memory=True, persistent_workers=True
     )
     print(f"Train batches : {len(train_loader)}")
     print(f"Val batches   : {len(val_loader)}")
@@ -130,7 +130,7 @@ def train(
     scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=15, T_mult=2)
 
     # ── Mixed Precision Scaler (speeds up training ~2x on T4) ─────────────────
-    scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
+    scaler = torch.amp.GradScaler('cuda', enabled=torch.cuda.is_available())
 
     # ── Resume ─────────────────────────────────────────────────────────────────
     start_epoch    = 0
@@ -172,7 +172,7 @@ def train(
             optimizer.zero_grad()
 
             # Mixed precision forward pass
-            with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
+            with torch.amp.autocast('cuda', enabled=torch.cuda.is_available()):
                 logits, _ = model(imgs)
                 loss      = criterion(logits, labels)
 
@@ -205,7 +205,7 @@ def train(
         with torch.no_grad():
             for imgs, labels in val_loader:
                 imgs, labels = imgs.to(device), labels.to(device)
-                with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
+                with torch.amp.autocast('cuda', enabled=torch.cuda.is_available()):
                     logits, _ = model(imgs)
 
                 # Top-1
