@@ -8,3 +8,8 @@ node_modules/
 dist/
 .env
 .DS_Store
+
+# font identifier specifics
+model/data/
+*.zip
+**/__pycache__/
