@@ -5,11 +5,13 @@ import numpy as np
 FONTS_DIR = "data/fonts"
 OUTPUT_DIR = "data/dataset"
 IMG_SIZE = (128, 64)
-SAMPLES_PER_FONT = 12
+SAMPLES_PER_FONT = 50
 SAMPLE_TEXTS = [
-    "Handgloves", "Typography", "AaBbCc",
-    "FontID", "Design", "Hello World",
-    "Quick fox", "Spectrum", "ABCDE fghij", "Waltz"
+    "Handgloves", "Typography", "AaBbCc", "FontID",
+    "Design 2024", "Hello World", "Quick fox", "Spectrum",
+    "ABCDE fghij", "Waltz nymph", "Bright vixens",
+    "Pack my box", "Sphinx of black", "Five boxing",
+    "Jackdaws love", "Quartz glyph"
 ]
 
 def apply_augmentations(img, level=1):
@@ -60,7 +62,7 @@ def generate_dataset():
 
         count = 0
         for text in SAMPLE_TEXTS:
-            for font_size in [28, 32, 38]:
+            for font_size in [24, 28, 32, 36, 40, 44]:
                 if count >= SAMPLES_PER_FONT:
                     break
                 img = render_text_image(font_path, text, font_size)
