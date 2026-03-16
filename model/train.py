@@ -2,6 +2,7 @@ import os, json, time
 import torch
 import torch.nn as nn
 import timm
+from fastervit import create_model as create_fastervit
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
 from torch.optim import AdamW
@@ -13,14 +14,16 @@ class FontNet(nn.Module):
     def __init__(self, num_classes: int, embedding_dim: int = 256):
         super().__init__()
 
-        # FasterViT-2 — SOTA for font recognition (87.4% top-1)
-        self.backbone = timm.create_model(
+        # FasterViT-2 — SOTA for font recognition
+        # Note: requires 'pip install fastervit'
+        self.backbone = create_fastervit(
             'fastervit_2_224',
             pretrained=True,
-            num_classes=0,
-            global_pool='avg'
         )
-        backbone_out = self.backbone.num_features  # 768
+        # Remove original classifier to get features (768 for FasterViT-2)
+        # FasterViT-2 typically outputs 768 features before the head
+        backbone_out = 768 
+        self.backbone.classifier = nn.Identity() 
 
         self.embedding_head = nn.Sequential(
             nn.Linear(backbone_out, 512),
