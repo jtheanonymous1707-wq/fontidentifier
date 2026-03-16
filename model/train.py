@@ -186,13 +186,13 @@ def train(
             correct    += (logits.argmax(1) == labels).sum().item()
             total      += labels.size(0)
 
-            if batch_idx % 30 == 0:
+            if batch_idx % 100 == 0:
                 print(
                     f"  E{epoch+1:03d} | "
                     f"Batch {batch_idx:4d}/{len(train_loader)} | "
                     f"Loss: {loss.item():.4f} | "
                     f"Acc: {correct/total:.4f}",
-                    end='\r'
+                    flush=True
                 )
 
         if epoch >= warmup_epochs:
@@ -230,7 +230,8 @@ def train(
             f"Val@1: {val_acc:.4f} | "
             f"Val@5: {top5_acc:.4f} | "
             f"LR: {current_lr:.2e} | "
-            f"Time: {elapsed:.0f}s"
+            f"Time: {elapsed:.0f}s",
+            flush=True
         )
 
         # ── Save checkpoint every epoch ────────────────────────────────────────
