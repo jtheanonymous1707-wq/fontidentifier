@@ -747,7 +747,7 @@ train.train(
     checkpoint_path = f'{DRIVE_DIR}/checkpoints/latest.pt',
     best_model_path = f'{DRIVE_DIR}/checkpoints/best_model.pt',
     epochs          = 60,
-    batch_size      = 32,      # FasterViT-2 needs smaller batch
+    batch_size      = 96,      # increased for FasterViT/ConvNeXt on T4
     lr              = 1e-4,    # lower LR for fine-tuning
     patience        = 10,
     warmup_epochs   = 5,
