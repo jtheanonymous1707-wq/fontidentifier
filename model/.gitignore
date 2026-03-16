@@ -1,0 +1,11 @@
+.env
+venv/
+__pycache__/
+*.pyc
+data/
+dataset.zip
+font_data.zip
+fonts.zip
+checkpoint/
+latest.pt
+best_model.pt

@@ -1,9 +1,9 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pillow
-torch
 torchvision
 timm
-python-multipart
 supabase
 python-dotenv
+python-multipart
+numpy

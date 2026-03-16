@@ -29,13 +29,12 @@ class FontNet(nn.Module):
             nn.Linear(embedding_dim, num_classes)
         )
 
-    def forward(self, x, return_embedding=False):
+    def forward(self, x):
         features  = self.backbone(x)
         embedding = self.embedding_head(features)
         embedding = nn.functional.normalize(embedding, p=2, dim=1)
-        if return_embedding:
-            return embedding
-        return self.classifier(embedding), embedding
+        logits    = self.classifier(embedding)
+        return logits, embedding
 
 
 # ── Train Function ────────────────────────────────────────────────────────────
