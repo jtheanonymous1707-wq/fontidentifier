@@ -1,0 +1,10 @@
+# root .gitignore
+model/.env
+web/.env.local
+
+# common ignores
+node_modules/
+.next/
+dist/
+.env
+.DS_Store
