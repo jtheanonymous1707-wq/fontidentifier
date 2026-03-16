@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 pillow
-torchvision
 timm
 supabase
 python-dotenv
