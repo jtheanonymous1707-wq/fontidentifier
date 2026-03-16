@@ -81,5 +81,14 @@ def generate_dataset():
 
     print(f"Dataset ready at {OUTPUT_DIR}")
 
+    print("Removing empty class folders...")
+    removed = 0
+    for class_dir in os.listdir(OUTPUT_DIR):
+        full_path = os.path.join(OUTPUT_DIR, class_dir)
+        if os.path.isdir(full_path) and len(os.listdir(full_path)) == 0:
+            os.rmdir(full_path)
+            removed += 1
+    print(f"Cleaned {removed} empty folders. Dataset ready.")
+
 if __name__ == "__main__":
     generate_dataset()
