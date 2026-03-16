@@ -599,8 +599,8 @@ MODEL_DIR = f'{REPO_DIR}/model'
 if MODEL_DIR not in sys.path:
     sys.path.insert(0, MODEL_DIR)
 
-# FasterViT-2 requires huggingface_hub for weight download
-!pip install -q timm huggingface_hub
+# timm only — no fastervit package needed
+!pip install -q timm
 
 import torch
 print(f"PyTorch : {torch.__version__}")
@@ -610,7 +610,12 @@ print(f"VRAM    : {torch.cuda.get_device_properties(0).total_memory/1e9:.1f}GB")
 if 'train' in sys.modules:
     del sys.modules['train']
 import train
-print(f"Backbone: {train.FontNet(10).backbone.__class__.__name__}")
+
+# Verify backbone loaded correctly
+test_model = train.FontNet(10)
+print(f"Backbone : {test_model.backbone.__class__.__name__}")
+print(f"Backbone out features : {test_model.backbone.num_features}")
+del test_model
 print("Setup complete ✅")
 ```
 
@@ -680,26 +685,25 @@ print("Dataset ready ✅")
 
 ***
 
-### Cell 4 — Verify FasterViT-2 Fits in Memory
+### Cell 4 — ConvNeXt-Base Memory Check
 
 ```python
 import torch, train
 
-print("Testing FasterViT-2 memory usage...")
-model  = train.FontNet(num_classes=100).cuda()
-dummy  = torch.randn(32, 3, 224, 224).cuda()   # batch=32
+print("Testing ConvNeXt-Base memory usage...")
+model = train.FontNet(num_classes=100).cuda()
+dummy = torch.randn(32, 3, 224, 224).cuda()
 
 with torch.cuda.amp.autocast():
     logits, emb = model(dummy)
 
-mem_used = torch.cuda.memory_allocated() / 1e9
+mem_used  = torch.cuda.memory_allocated() / 1e9
 mem_total = torch.cuda.get_device_properties(0).total_memory / 1e9
+params    = sum(p.numel() for p in model.parameters()) / 1e6
 
 print(f"Logits shape    : {logits.shape}")
 print(f"Embedding shape : {emb.shape}")
 print(f"GPU mem used    : {mem_used:.2f}GB / {mem_total:.1f}GB")
-
-params = sum(p.numel() for p in model.parameters()) / 1e6
 print(f"Model params    : {params:.1f}M")
 
 del model, dummy
@@ -712,8 +716,8 @@ Expected output:
 ```
 Logits shape    : torch.Size([32, 100])
 Embedding shape : torch.Size([32, 256])
-GPU mem used    : 4.2GB / 15.0GB
-Model params    : 78.3M
+GPU mem used    : 3.8GB / 15.6GB
+Model params    : 89.1M
 Memory check passed ✅
 ```
 

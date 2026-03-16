@@ -2,7 +2,6 @@ import os, json, time
 import torch
 import torch.nn as nn
 import timm
-from fastervit import create_model as create_fastervit
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
 from torch.optim import AdamW
@@ -14,21 +13,19 @@ class FontNet(nn.Module):
     def __init__(self, num_classes: int, embedding_dim: int = 256):
         super().__init__()
 
-        # FasterViT-2 — SOTA for font recognition
-        # Note: requires 'pip install fastervit'
-        self.backbone = create_fastervit(
-            'fastervit_2_224',
+        # ConvNeXt-Base — timm native, 84%+ accuracy, no dependency conflicts
+        self.backbone = timm.create_model(
+            'convnext_base',
             pretrained=True,
+            num_classes=0,
+            global_pool='avg'
         )
-        # Remove original classifier to get features (768 for FasterViT-2)
-        # FasterViT-2 typically outputs 768 features before the head
-        backbone_out = 768 
-        self.backbone.classifier = nn.Identity() 
+        backbone_out = self.backbone.num_features  # 1024
 
         self.embedding_head = nn.Sequential(
             nn.Linear(backbone_out, 512),
             nn.BatchNorm1d(512),
-            nn.GELU(),              # GELU works better than ReLU for ViT models
+            nn.GELU(),
             nn.Dropout(0.3),
             nn.Linear(512, embedding_dim),
             nn.BatchNorm1d(embedding_dim)
@@ -152,7 +149,7 @@ def train(
         patience_count = ckpt['patience_count']
         print(f"Resumed from epoch {start_epoch} | Best: {best_val_acc:.4f}")
     else:
-        print(f"\nStarting fresh training with FasterViT-2")
+        print(f"\nStarting fresh training with ConvNeXt-Base")
 
     print("─" * 60)
 
